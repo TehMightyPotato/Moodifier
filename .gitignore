@@ -3,3 +3,10 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+PnP.Moodifier.sln.DotSettings.user
+
+.idea/
+
+PnP.Moodifier.Server/appsettings.json
+
+PnP.Moodifier.Server/Assets/

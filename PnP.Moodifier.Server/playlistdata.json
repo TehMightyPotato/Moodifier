@@ -1,0 +1,18 @@
+{
+  "Playlists": [
+    {
+      "Name": "Playlist1",
+      "Songs": [
+        "Y:/Repositories/PnP.Moodifier/PnP.Moodifier.Server/Assets/0.1.mp3",
+        "Y:/Repositories/PnP.Moodifier/PnP.Moodifier.Server/Assets/0.2.mp3"
+      ]
+    },
+    {
+      "Name": "Playlist2",
+      "Songs": [
+        "Y:/Repositories/PnP.Moodifier/PnP.Moodifier.Server/Assets/Hookshot_OST_-_Discover_The_Unknown.mp3",
+        "Y:/Repositories/PnP.Moodifier/PnP.Moodifier.Server/Assets/Hookshot_OST_-_HubWorld.mp3"
+      ]
+    }
+  ]
+}
