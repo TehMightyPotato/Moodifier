@@ -2,5 +2,5 @@ namespace MightyPotato.PnP.Moodifier.Server.Audio.Models;
 
 public class AudioData
 {
-    public List<Playlist>? Playlists { get; set; }
+    public List<PlaylistElement>? Playlists { get; set; }
 }

@@ -14,9 +14,17 @@ public class AudioHub : Hub
         _audioPlaybackService = audioPlaybackService;
     }
 
-    public async Task PlayFromPlaylist(string playlistName)
+    public async Task PlayFromPlaylist(string playlistPath)
     {
-        await _audioPlaybackService.PlayFromPlaylistAsync(playlistName);
+        try
+        {
+            await _audioPlaybackService.PlayFromPlaylistAsync(playlistPath);
+        }
+        catch (NullReferenceException e)
+        {
+            _logger.LogError("Path {Path} has thrown exception: {Message} {NewLine} {StackTrace}", playlistPath, e.Message,
+                Environment.NewLine, e.StackTrace);
+        }
     }
 
     public Task StopPlayback()

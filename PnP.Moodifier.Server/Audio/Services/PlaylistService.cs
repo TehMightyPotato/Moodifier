@@ -1,30 +1,43 @@
 using Microsoft.Extensions.Options;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
-using Newtonsoft.Json;
 
 namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
 
 public class PlaylistService
 {
-    private readonly IOptions<AudioConfig> _config;
+    private readonly ILogger<PlaylistService> _logger;
+    private readonly AudioConfig _config;
 
-    private PlaylistsContainer _playlistsContainer;
+    private PlaylistHandler _playlistHandler;
 
-    public PlaylistService(IOptions<AudioConfig> config)
+    public PlaylistService(ILogger<PlaylistService> logger, IOptions<AudioConfig> config)
     {
-        _config = config;
-        var json = File.ReadAllText(config.Value.PlaylistDataPath!);
-        _playlistsContainer = JsonConvert.DeserializeObject<PlaylistsContainer>(json)!;
+        _logger = logger;
+        _config = config.Value;
+        _playlistHandler = new PlaylistHandler(_config.PlaylistPath);
+        _logger.LogInformation("Playlist Handler loaded!");
     }
 
-    public List<Playlist> GetAll()
+    public List<PlaylistElement> GetAll()
     {
-        return _playlistsContainer.Playlists!;
+        return _playlistHandler.Playlists;
     }
 
-    public Playlist GetByName(string name)
+    public List<PlaylistElement> GetStructure()
     {
-        return _playlistsContainer.GetByName(name);
+        return _playlistHandler.GetStructure();
+    }
+
+    public PlaylistElement GetByPath(string name)
+    {
+        return _playlistHandler.GetByPath(name);
+    }
+
+    public void Reload()
+    {
+        _logger.LogWarning("Reloading playlist handler...");
+        _playlistHandler = new PlaylistHandler(_config.PlaylistPath);
+        _logger.LogWarning("Playlist Handler loaded!");
     }
 }

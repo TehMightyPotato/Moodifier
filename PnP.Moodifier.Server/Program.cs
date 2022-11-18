@@ -21,12 +21,20 @@ builder.Services.Configure<AudioConfig>(configuration.GetSection("Audio"));
 builder.Services.AddSingleton<PlaylistService>();
 builder.Services.AddSingleton<AudioPlaybackService>();
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 builder.Services.AddEndpointsApiExplorer();
+
+builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
 app.UseRouting();
+app.MapRazorPages();
 app.MapHub<AudioHub>("/Audio");
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 app.MapControllers();
+app.UseStaticFiles();
 await app.RunAsync();
 
 return;
@@ -40,12 +48,5 @@ connection.Closed += async (error) =>
 };
 await connection.StartAsync();
 await Task.Delay(100);
-await connection.InvokeAsync("PlayFromPlaylist", "Playlist2");
-await Task.Delay(5000);
-await connection.InvokeAsync("PlayFromPlaylist", "Playlist2");
-await Task.Delay(5000);
-await connection.InvokeAsync("StopPlayback");
-await Task.Delay(5000);
-await connection.InvokeAsync("PlayFromPlaylist", "Playlist2");
-await Task.Delay(5000);
-await connection.InvokeAsync("PlayFromPlaylist", "Playlist2");
+await connection.InvokeAsync("PlayFromPlaylist", "Tavern/Normal");
+await Task.Delay(500000);

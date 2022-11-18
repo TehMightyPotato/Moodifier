@@ -1,0 +1,29 @@
+@using MightyPotato.PnP.Moodifier.Server.Audio.Models
+<div class="card w-25" style="margin-bottom:15px" @onclick="OpenFolder">
+    <div class="card-header font-weight-bold">Folder</div>
+    <div class="card-body">
+        @name
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PlaylistElement PlaylistElement { get; set; }
+
+    private string name;
+
+    [Parameter]
+    public EventCallback<PlaylistElement> OnClickCallback { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        name = PlaylistElement.Name;
+    }
+
+    private async Task OpenFolder()
+    {
+        await OnClickCallback.InvokeAsync(PlaylistElement);
+    }
+
+}

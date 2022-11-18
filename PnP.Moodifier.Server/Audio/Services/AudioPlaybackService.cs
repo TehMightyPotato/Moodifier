@@ -1,18 +1,17 @@
-using Microsoft.Extensions.Options;
+using MightyPotato.PnP.Moodifier.Server.Audio.Enums;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
-using MightyPotato.PnP.Moodifier.Server.Configuration;
-using Newtonsoft.Json;
 
 namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
 
 public class AudioPlaybackService : IDisposable
 {
-    private ILogger<AudioPlaybackService> _logger;
+    private PlaybackState _currentPlaybackState;
+    private readonly ILogger<AudioPlaybackService> _logger;
     private readonly PlaylistService _playlistService;
+    
+    private FadingAudioPlaybackContainer? _currentPlaybackContainer;
 
-    private FadingAudioPlaybackContainer _currentPlaybackContainer = null!;
-    private FadingAudioPlaybackContainer _temporaryPlaybackContainer = null!;
-
+    private PlaylistElement? _currentPlaylist;
 
     public AudioPlaybackService(ILogger<AudioPlaybackService> logger, PlaylistService playlistService)
     {
@@ -20,34 +19,58 @@ public class AudioPlaybackService : IDisposable
         _playlistService = playlistService;
     }
 
-    public async Task PlayFromPlaylistAsync(string name)
+    public async Task<string> PlayFromPlaylistAsync(string path)
     {
-        var playlist = _playlistService.GetByName(name);
-        var songPath = playlist.GetRandom();
-        if (_currentPlaybackContainer == null)
+        _currentPlaylist = _playlistService.GetByPath(path);
+        return await PlayFromPlaylistAsync(_currentPlaylist!);
+    }
+
+    private async Task<string> PlayFromPlaylistAsync(PlaylistElement playlistElement)
+    {
+        //TODO: Either block this or enforce blocking of input while fade is in progress...
+        if (_currentPlaybackState == PlaybackState.Fading) return null;
+        var songPath = playlistElement.GetNext();
+        _logger.LogInformation("Playing song: {SongPath}", songPath);
+        _currentPlaybackState = PlaybackState.Fading;
+        if (_currentPlaybackContainer != null)
         {
-            _currentPlaybackContainer = new FadingAudioPlaybackContainer(songPath);
-            await _currentPlaybackContainer.FadeInAsync(3000);
-        }
-        else
-        {
-            _temporaryPlaybackContainer = new FadingAudioPlaybackContainer(songPath);
-            _ = _currentPlaybackContainer.FadeOutAsync(3000);
-            await _temporaryPlaybackContainer.FadeInAsync(3000);
+            //Need to unsubscribe the event handler, otherwise infinite loop with playback -> stop -> PlayNextSongAsync is possible
+            _currentPlaybackContainer.PlaybackStopped -= PlayNextSongAsync;
+            await _currentPlaybackContainer.FadeOutAsync(3000);
             _currentPlaybackContainer.Dispose();
-            _currentPlaybackContainer = _temporaryPlaybackContainer;
+        }
+        _currentPlaybackContainer = new FadingAudioPlaybackContainer(songPath);
+        _currentPlaybackContainer.PlaybackStopped += PlayNextSongAsync;
+        await _currentPlaybackContainer.FadeInAsync(3000);
+        _currentPlaybackState = PlaybackState.Playing;
+        return playlistElement.Path;
+    }
+    
+    //Plays new song after current song stopped playing;
+    private async void PlayNextSongAsync(object? sender, EventArgs e)
+    {
+        if (_currentPlaybackState != PlaybackState.Playing) return;
+        try
+        {
+            await PlayFromPlaylistAsync(_currentPlaylist ??
+                                        throw new NullReferenceException(
+                                            "Attempted to play from playlist which was null"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogInformation("Song ended while fade was in progress");
         }
     }
 
     public void StopPlayback()
     {
-        _currentPlaybackContainer.Dispose();
-        _temporaryPlaybackContainer.Dispose();
+        _currentPlaybackState = PlaybackState.Stopped;
+        _currentPlaybackContainer?.Dispose();
     }
 
     public void Dispose()
     {
-        _currentPlaybackContainer.Dispose();
-        _temporaryPlaybackContainer.Dispose();
+        _currentPlaybackState = PlaybackState.Stopped;
+        _currentPlaybackContainer?.Dispose();
     }
 }

@@ -8,20 +8,31 @@ namespace MightyPotato.PnP.Moodifier.Server.Controller;
 [Route("api/[controller]")]
 public class PlaylistsController : ControllerBase
 {
+    private readonly ILogger<PlaylistsController> _logger;
     private readonly PlaylistService _playlistService;
 
-    public PlaylistsController(PlaylistService playlistService)
+    public PlaylistsController(ILogger<PlaylistsController> logger,PlaylistService playlistService)
     {
+        _logger = logger;
         _playlistService = playlistService;
     }
     
-    [HttpGet("{name}")]
-    public ActionResult<Playlist> Get(string name)
+    [HttpGet("{*path}")]
+    public ActionResult<PlaylistElement> Get(string path)
     {
-        return _playlistService.GetByName(name);
+        try
+        {
+            return Ok(_playlistService.GetByPath(path));
+        }
+        catch (NullReferenceException e)
+        {
+            _logger.LogError("Path {Path} has thrown exception: {Message} {NewLine} {StackTrace}", path, e.Message,
+                Environment.NewLine, e.StackTrace);
+            return BadRequest("No such playlist");
+        }
     }
     [HttpGet()]
-    public ActionResult<List<Playlist>> Get()
+    public ActionResult<List<PlaylistElement>> Get()
     {
         return _playlistService.GetAll();
     }

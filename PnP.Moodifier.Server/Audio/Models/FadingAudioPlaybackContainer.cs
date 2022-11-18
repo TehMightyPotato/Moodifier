@@ -8,6 +8,9 @@ public sealed class FadingAudioPlaybackContainer: IDisposable
     private readonly FadeInOutSampleProvider _fader;
     private readonly WaveOutEvent _waveOut;
     private AudioFileReader _fileReader;
+
+    public event EventHandler? PlaybackStopped;
+    
     
     public FadingAudioPlaybackContainer(string filePath)
     {
@@ -15,6 +18,7 @@ public sealed class FadingAudioPlaybackContainer: IDisposable
         _fader = new FadeInOutSampleProvider(_fileReader, true);
         _waveOut = new WaveOutEvent();
         _waveOut.Init(_fader);
+        _waveOut.PlaybackStopped += (_, _) => { PlaybackStopped?.Invoke(this, EventArgs.Empty); };
     }
 
     public async Task FadeInAsync(int durationInMs)
