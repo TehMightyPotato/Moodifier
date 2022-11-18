@@ -17,15 +17,18 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddSignalR();
+
 builder.Services.Configure<AudioConfig>(configuration.GetSection("Audio"));
+
 builder.Services.AddSingleton<PlaylistService>();
 builder.Services.AddSingleton<AudioPlaybackService>();
+
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.WebHost.UseStaticWebAssets();
+builder.WebHost.UseWebRoot("wwwroot").UseStaticWebAssets();
 
 var app = builder.Build();
 app.UseRouting();

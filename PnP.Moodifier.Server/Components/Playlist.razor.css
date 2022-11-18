@@ -1,0 +1,7 @@
+﻿.playlist{
+    cursor: pointer;
+}
+.playlist-header-icon{
+    float: left; 
+    display: inline-block;
+}

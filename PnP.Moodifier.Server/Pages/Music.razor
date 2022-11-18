@@ -6,40 +6,52 @@
 @inject AudioPlaybackService PlaybackService
 
 <PageTitle>Moodifier Music Player</PageTitle>
-@if (_backStack != null && _backStack.Count > 0)
-{
-    <button type="button" class="btn btn-lg btn-primary" @onclick="BackButtonClicked"><i class="material-symbols-outlined">arrow_back</i></button>
-}
-else
-{
-    <button type="button" class="btn btn-lg btn-primary" disabled><i class="material-symbols-outlined">arrow_back</i></button>
-}
-@if (_playlistStructure != null)
-{
-    <ul>
+<div class="top-0 w-100">
+    <div class="float-start">
+        
+        @if (_backStack != null && _backStack.Count > 0)
+        {
+            <button type="button" class="btn btn-lg btn-primary" @onclick="BackButtonClicked">
+                <i class="material-symbols-outlined d-flex">arrow_back</i>
+            </button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-lg btn-primary disabled" disabled>
+                <i class="material-symbols-outlined d-flex">arrow_back</i>
+            </button>
+        }
+    </div>
+    <div class="float-end">
+        <button type="button" class="btn btn-lg btn-danger">
+            <i class="material-symbols-outlined d-flex">stop_circle</i>
+        </button>
+    </div>
+    
+</div>
+
+<div class="d-flex flex-column min-vh-100 justify-content-center align-items-center">
+    @if (_playlistStructure != null)
+    {
         @foreach (var playlist in _current)
         {
             @if (playlist.MusicFiles != null && playlist.MusicFiles.Count <= 0)
             {
-                <li>
-                    <Folder PlaylistElement="playlist" OnClickCallback="FolderClicked"></Folder>
-                </li>
+                <Folder PlaylistElement="playlist" OnClickCallback="FolderClicked"></Folder>
             }
             else
             {
-                <li>
-                    <Playlist PlaylistElement="playlist" OnClickCallback="PlaylistClicked"></Playlist>
-                </li>
+                <Playlist PlaylistElement="playlist" OnClickCallback="PlaylistClicked"></Playlist>
             }
         }
-    </ul>
-}
-else
-{
-    <div class="spinner-border align-content-center" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-}
+    }
+    else
+    {
+        <div class="spinner-border align-content-center" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+</div>
 
 @code {
     private List<PlaylistElement>? _playlistStructure;

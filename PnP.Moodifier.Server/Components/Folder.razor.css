@@ -1,0 +1,7 @@
+﻿.folder{
+    cursor: pointer;
+}
+.folder-header-icon{
+    float: left;
+    display: inline-block;
+}
