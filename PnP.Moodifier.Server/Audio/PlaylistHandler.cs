@@ -1,4 +1,6 @@
-namespace MightyPotato.PnP.Moodifier.Server.Audio.Models;
+using MightyPotato.PnP.Moodifier.Server.Audio.Models;
+
+namespace MightyPotato.PnP.Moodifier.Server.Audio;
 
 public class PlaylistHandler
 {
@@ -61,7 +63,8 @@ public class PlaylistHandler
                 continue;
             }
 
-            if (Path.GetFileNameWithoutExtension(file) == "cover")
+            if (Path.GetFileNameWithoutExtension(file) == "_cover" &&
+                _imageFileExtensions.Contains(Path.GetExtension(file).ToLowerInvariant()))
             {
                 imagePath = file;
                 continue;
@@ -71,8 +74,8 @@ public class PlaylistHandler
             {
                 name = File.ReadAllText(file);
             }
-            
         }
+
         var children = new List<PlaylistElement?>();
         var subDirectories = Directory.EnumerateDirectories(fileSystemPath);
         foreach (var subDirectory in subDirectories)
