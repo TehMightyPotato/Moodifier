@@ -1,0 +1,11 @@
+﻿.ellipsize-left {
+    /* Standard CSS ellipsis */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    /*width: 200px;*/
+
+    /* Beginning of string */
+    direction: rtl;
+    text-align: left;
+}

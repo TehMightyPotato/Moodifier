@@ -1,29 +1,48 @@
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
-<div class="card w-25 folder" style="margin-bottom:15px" @onclick="OpenFolder">
-    <div class="card-header font-weight-bold"><i class="material-symbols-outlined folder-header-icon">folder</i> > @name </div>
-    <div class="card-body">
-        @name
+<div class="card w-100 folder text-start bg-dark text-white shadow" style="margin-bottom:15px" @onclick="OpenFolder">
+    <div class="card-header font-weight-bold d-flex w-100">
+        <div>
+            <i class="material-symbols-outlined folder-header-icon">folder</i>
+        </div>
+        <div class="ps-1 pe-1">
+            >
+        </div>
+        <div class="ellipsize-left w-auto">
+            @GetCardTitle()
+        </div>
+    </div>
+    <div class="card-img-bottom w-100 playlist-image-container">
+        <img class="playlist-image" src="@GetImagePath()"/>
     </div>
 </div>
 
 @code {
-    [Parameter]
-    public PlaylistElement PlaylistElement { get; set; }
 
-    private string name;
+    [Parameter]
+#pragma warning disable CS8618
+        public PlaylistElement PlaylistElement { get; set; }
+#pragma warning restore CS8618
 
     [Parameter]
     public EventCallback<PlaylistElement> OnClickCallback { get; set; }
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        name = PlaylistElement.Name;
-    }
-
     private async Task OpenFolder()
     {
         await OnClickCallback.InvokeAsync(PlaylistElement);
+    }
+
+    private string GetCardTitle()
+    {
+        return PlaylistElement.Path.Replace("/", " > ");
+    }
+
+    private string GetImagePath()
+    {
+        if (PlaylistElement.ImagePath != null && PlaylistElement.ImagePath.Length > 0)
+        {
+            return "/images/playlists" + PlaylistElement.ImagePath;
+        }
+        return "/images/placeholder/playlist_cover_placeholder.png";
     }
 
 }

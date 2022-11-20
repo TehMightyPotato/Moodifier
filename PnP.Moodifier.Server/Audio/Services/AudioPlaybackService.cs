@@ -5,6 +5,8 @@ namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
 
 public class AudioPlaybackService : IDisposable
 {
+    public event EventHandler<PlaylistElement> PlaylistChanged; 
+
     private PlaybackState _currentPlaybackState;
     private readonly ILogger<AudioPlaybackService> _logger;
     private readonly PlaylistService _playlistService;
@@ -21,7 +23,12 @@ public class AudioPlaybackService : IDisposable
 
     public async Task<string> PlayFromPlaylistAsync(string path)
     {
-        _currentPlaylist = _playlistService.GetByPath(path);
+        var newPlaylist = _playlistService.GetByPath(path);
+        if (newPlaylist != _currentPlaylist)
+        {
+            OnPlaylistChanged(this, newPlaylist);
+        }
+        _currentPlaylist = newPlaylist;
         return await PlayFromPlaylistAsync(_currentPlaylist!);
     }
 
@@ -66,6 +73,16 @@ public class AudioPlaybackService : IDisposable
     {
         _currentPlaybackState = PlaybackState.Stopped;
         _currentPlaybackContainer?.Dispose();
+    }
+
+    public PlaylistElement? GetCurrentPlaylist()
+    {
+        return _currentPlaylist;
+    }
+
+    private void OnPlaylistChanged(object sender, PlaylistElement newPlaylist)
+    {
+        PlaylistChanged?.Invoke(this, newPlaylist);
     }
 
     public void Dispose()

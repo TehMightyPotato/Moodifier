@@ -1,29 +1,54 @@
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
-<div class="card w-25 playlist" style="margin-bottom:15px" @onclick="PlayPlaylist">
-    <div class="card-header font-weight-bold"> <i class="material-symbols-outlined playlist-header-icon">queue_music</i> > @name</div>
-    <div class="card-body">
-        @name
+<div class="card w-100 playlist text-start @(IsPlaying ? "bg-success text-white" : "bg-dark text-white") shadow" style="margin-bottom:15px" @onclick="PlayPlaylist">
+    <div class="card-header font-weight-bold d-flex w-100">
+        <div>
+            <i class="material-symbols-outlined folder-header-icon">queue_music</i>
+        </div>
+        <div class="ps-1 pe-1">
+            >
+        </div>
+        <div class="ellipsize-left w-auto">
+            @GetCardTitle()
+        </div>
+    </div>
+    <div class="card-img-bottom w-100 playlist-image-container position-relative">
+        <img class="playlist-image" src="@GetImagePath()"/>
+        <i class="material-symbols-outlined center-icon">play_circle</i>
     </div>
 </div>
 
 @code {
-    [Parameter]
-    public PlaylistElement PlaylistElement { get; set; }
 
-    private string name;
+    [Parameter]
+#pragma warning disable CS8618
+        public PlaylistElement PlaylistElement { get; set; }
+#pragma warning restore CS8618
+
+    private bool _mouseOver;
 
     [Parameter]
     public EventCallback<PlaylistElement> OnClickCallback { get; set; }
 
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        name = PlaylistElement.Name;
-    }
+    [Parameter]
+    public bool IsPlaying { get; set; }
 
     private async Task PlayPlaylist()
     {
         await OnClickCallback.InvokeAsync(PlaylistElement);
+    }
+
+    private string GetCardTitle()
+    {
+        return PlaylistElement.Path.Replace("/", " > ");
+    }
+
+    private string GetImagePath()
+    {
+        if (PlaylistElement.ImagePath != null && PlaylistElement.ImagePath.Length > 0)
+        {
+            return "/images/playlists" + PlaylistElement.ImagePath;
+        }
+        return "/images/placeholder/playlist_cover_placeholder.png";
     }
 
 }

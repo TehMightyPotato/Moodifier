@@ -2,26 +2,23 @@ namespace MightyPotato.PnP.Moodifier.Server.Audio.Models;
 
 public class PlaylistElement
 {
-    public PlaylistElement(string path, string name, string? imagePath, List<string>? musicFiles, List<PlaylistElement?> children)
+    public string Path { get; set; }
+
+    public string? ImagePath { get; set; }
+
+    public List<string>? MusicFiles { get; set; }
+
+    public List<PlaylistElement?> Children { get; set; }
+
+    private Queue<string> _songsToPlayQueue = new();
+
+    public PlaylistElement(string path, string? imagePath, List<string>? musicFiles, List<PlaylistElement?> children)
     {
         Path = path;
-        Name = name;
         ImagePath = imagePath;
         MusicFiles = musicFiles;
         Children = children;
     }
-
-    public string Path { get; set; }
-    
-    public string Name { get; set; }
-
-    public string? ImagePath { get; set; }
-    
-    public List<string>? MusicFiles { get; set; }
-    
-    public List<PlaylistElement?> Children { get; set; }
-
-    private Queue<string> _songsToPlayQueue = new();
 
     public string GetNext()
     {

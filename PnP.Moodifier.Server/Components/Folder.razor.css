@@ -5,3 +5,60 @@
     float: left;
     display: inline-block;
 }
+.ellipsize-left {
+     /* Standard CSS ellipsis */
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: clip;
+     /*width: 200px;*/
+
+     /* Beginning of string */
+     direction: rtl;
+     text-align: left;
+ }
+
+/* xs */
+.playlist-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 10rem;
+}
+/* sm */
+@media (min-width: 768px) {
+    /* xs */
+    .playlist-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        height: 15rem;
+    }
+}
+/* md */
+@media (min-width: 992px) {
+    .playlist-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        height: 17rem;
+    }
+}
+/* lg */
+@media (min-width: 1200px) {
+    .playlist-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        height: 20rem;
+    }
+}
+
+.playlist-image {
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%
+}

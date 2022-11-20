@@ -5,3 +5,85 @@
     float: left; 
     display: inline-block;
 }
+.ellipsize-left {
+    /* Standard CSS ellipsis */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    /*width: 200px;*/
+
+    /* Beginning of string */
+    direction: rtl;
+    text-align: left;
+}
+
+/* xs */
+.playlist-image-container {
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    height: 10rem;
+}
+.center-icon{
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+}
+/* sm */
+@media (min-width: 768px) {
+    /* xs */
+    .playlist-image-container {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+        height: 15rem;
+    }
+    .center-icon{
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+    }
+}
+/* md */
+@media (min-width: 992px) {
+    .playlist-image-container {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+        height: 17rem;
+    }
+    .center-icon{
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        font-size: 4rem;
+    }
+}
+/* lg */
+@media (min-width: 1200px) {
+    .playlist-image-container {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+        height: 20rem;
+    }
+    .center-icon{
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        font-size: 5rem;
+    }
+}
+
+.playlist-image {
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    overflow: hidden;
+}
