@@ -5,26 +5,25 @@ namespace MightyPotato.PnP.Moodifier.Server.Audio.Models;
 
 public sealed class FadingAudioPlaybackContainer: IDisposable
 {
+    private readonly AudioPlaybackEngine _engine;
     private readonly FadeInOutSampleProvider _fader;
-    private readonly WaveOutEvent _waveOut;
-    private AudioFileReader _fileReader;
+    private readonly AudioFileReader _fileReader;
 
     public event EventHandler? PlaybackStopped;
     
     
-    public FadingAudioPlaybackContainer(string filePath)
+    public FadingAudioPlaybackContainer(string filePath, AudioPlaybackEngine engine)
     {
+        _engine = engine;
         _fileReader = new AudioFileReader(filePath);
         _fader = new FadeInOutSampleProvider(_fileReader, true);
-        _waveOut = new WaveOutEvent();
-        _waveOut.Init(_fader);
-        _waveOut.PlaybackStopped += (_, _) => { PlaybackStopped?.Invoke(this, EventArgs.Empty); };
+        _engine.PlaybackStopped += (sender, args) => PlaybackStopped?.Invoke(sender, EventArgs.Empty);
     }
 
     public async Task FadeInAsync(int durationInMs)
     {
         _fader.BeginFadeIn(durationInMs);
-        _waveOut.Play();
+        _engine.AddMixerInput(_fader);
         await Task.Delay(durationInMs);
     }
 
@@ -32,12 +31,11 @@ public sealed class FadingAudioPlaybackContainer: IDisposable
     {
         _fader.BeginFadeOut(durationInMs);
         await Task.Delay(durationInMs);
-        _waveOut.Stop();
+        _engine.RemoveMixerInput(_fader);
     }
 
     public void Dispose()
     {
-        _waveOut.Dispose();
         _fileReader.Dispose();
     }
 }

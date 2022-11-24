@@ -1,5 +1,7 @@
-using MightyPotato.PnP.Moodifier.Server.Audio.Enums;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using PlaybackState = MightyPotato.PnP.Moodifier.Server.Audio.Enums.PlaybackState;
 
 namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
 
@@ -10,15 +12,17 @@ public class AudioPlaybackService : IDisposable
     private PlaybackState _currentPlaybackState;
     private readonly ILogger<AudioPlaybackService> _logger;
     private readonly PlaylistService _playlistService;
-    
+    private readonly AudioPlaybackEngine _engine;
+
     private FadingAudioPlaybackContainer? _currentPlaybackContainer;
 
     private PlaylistElement? _currentPlaylist;
 
-    public AudioPlaybackService(ILogger<AudioPlaybackService> logger, PlaylistService playlistService)
+    public AudioPlaybackService(ILogger<AudioPlaybackService> logger, PlaylistService playlistService, AudioPlaybackEngine engine)
     {
         _logger = logger;
         _playlistService = playlistService;
+        _engine = engine;
     }
 
     public async Task<string> PlayFromPlaylistAsync(string path)
@@ -46,7 +50,7 @@ public class AudioPlaybackService : IDisposable
             await _currentPlaybackContainer.FadeOutAsync(3000);
             _currentPlaybackContainer.Dispose();
         }
-        _currentPlaybackContainer = new FadingAudioPlaybackContainer(songPath);
+        _currentPlaybackContainer = new FadingAudioPlaybackContainer(songPath, _engine);
         _currentPlaybackContainer.PlaybackStopped += PlayNextSongAsync;
         await _currentPlaybackContainer.FadeInAsync(3000);
         _currentPlaybackState = PlaybackState.Playing;
