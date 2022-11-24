@@ -10,3 +10,5 @@ PnP.Moodifier.sln.DotSettings.user
 PnP.Moodifier.Server/appsettings.json
 
 PnP.Moodifier.Server/Assets/
+
+PnP.Moodifier.Server/wwwroot/images/
