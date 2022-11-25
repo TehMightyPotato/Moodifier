@@ -1,10 +1,6 @@
 ﻿using MightyPotato.PnP.Moodifier.Server.Audio.Services;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
 using MightyPotato.PnP.Moodifier.Server.Hubs;
-using Microsoft.AspNetCore.SignalR.Client;
-using MightyPotato.PnP.Moodifier.Server.Audio;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 
 var configuration = new ConfigurationBuilder()
