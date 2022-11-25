@@ -8,10 +8,10 @@ namespace MightyPotato.PnP.Moodifier.Server.Controller;
 [Route("api/[controller]")]
 public class PlaybackController : ControllerBase
 {
-    private AudioPlaybackService _playbackService;
+    private MusicPlaybackService _playbackService;
     private readonly ILogger<PlaybackController> _logger;
 
-    public PlaybackController(AudioPlaybackService playbackService, ILogger<PlaybackController> logger)
+    public PlaybackController(MusicPlaybackService playbackService, ILogger<PlaybackController> logger)
     {
         _playbackService = playbackService;
         _logger = logger;
@@ -32,7 +32,7 @@ public class PlaybackController : ControllerBase
         }
         catch (InvalidOperationException e)
         {
-            _logger.LogWarning("Tried to fade while fade was still in progress");
+            _logger.LogWarning("Exception: {E}", e);
             return Conflict("Another fade is in progress");
         }
     }

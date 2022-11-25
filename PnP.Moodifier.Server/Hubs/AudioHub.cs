@@ -6,19 +6,19 @@ namespace MightyPotato.PnP.Moodifier.Server.Hubs;
 public class AudioHub : Hub
 {
     private readonly ILogger<AudioHub> _logger;
-    private readonly AudioPlaybackService _audioPlaybackService;
+    private readonly MusicPlaybackService _musicPlaybackService;
 
-    public AudioHub(ILogger<AudioHub> logger, AudioPlaybackService audioPlaybackService)
+    public AudioHub(ILogger<AudioHub> logger, MusicPlaybackService musicPlaybackService)
     {
         _logger = logger;
-        _audioPlaybackService = audioPlaybackService;
+        _musicPlaybackService = musicPlaybackService;
     }
 
     public async Task PlayFromPlaylist(string playlistPath)
     {
         try
         {
-            await _audioPlaybackService.PlayFromPlaylistAsync(playlistPath);
+            await _musicPlaybackService.PlayFromPlaylistAsync(playlistPath);
         }
         catch (NullReferenceException e)
         {
@@ -29,7 +29,7 @@ public class AudioHub : Hub
 
     public Task StopPlayback()
     {
-        _audioPlaybackService.StopPlayback();
+        _musicPlaybackService.StopPlayback();
         return Task.CompletedTask;
     }
 }

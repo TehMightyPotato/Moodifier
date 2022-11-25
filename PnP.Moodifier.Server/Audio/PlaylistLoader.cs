@@ -79,7 +79,7 @@ public class PlaylistLoader
         return new PlaylistElement(thisPlaylistPath, imagePath, musicFiles, children);
     }
 
-    private string CopyRelatedImage(string originalImagePath,string playlistElementPath)
+    private string CopyRelatedImage(string originalImagePath,string? playlistElementPath)
     {
         var newPath = _imageDirectoryPath + playlistElementPath;
         var originalExtension = Path.GetExtension(originalImagePath);

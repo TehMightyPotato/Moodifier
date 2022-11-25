@@ -18,7 +18,7 @@ public class PlaylistsController : ControllerBase
     }
     
     [HttpGet("{*path}")]
-    public ActionResult<PlaylistElement> Get(string path)
+    public ActionResult<PlaylistElement> Get(string? path)
     {
         try
         {

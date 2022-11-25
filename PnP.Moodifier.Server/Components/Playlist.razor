@@ -23,9 +23,7 @@
 #pragma warning disable CS8618
         public PlaylistElement PlaylistElement { get; set; }
 #pragma warning restore CS8618
-
-    private bool _mouseOver;
-
+    
     [Parameter]
     public EventCallback<PlaylistElement> OnClickCallback { get; set; }
 
@@ -37,9 +35,9 @@
         await OnClickCallback.InvokeAsync(PlaylistElement);
     }
 
-    private string GetCardTitle()
+    private string? GetCardTitle()
     {
-        return PlaylistElement.Path.Replace("/", " > ");
+        return PlaylistElement?.Path.Replace("/", " > ");
     }
 
     private string GetImagePath()
