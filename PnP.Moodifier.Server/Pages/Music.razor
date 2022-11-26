@@ -3,7 +3,7 @@
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
 @using MightyPotato.PnP.Moodifier.Server.Components
 @inject PlaylistService PlaylistService
-@inject AudioPlaybackService PlaybackService
+@inject MusicPlaybackService PlaybackService
 
 <PageTitle>Moodifier Music Player</PageTitle>
 <div class="d-flex w-100 h-auto justify-content-between p-3 sticky-top">
@@ -85,6 +85,7 @@ else
         Init();
     }
 
+    //Called from OnInitialized AND on manual refresh via RefreshButtonClicked
     private void Init()
     {
         _playlistStructure = PlaylistService.GetStructure();
@@ -105,7 +106,6 @@ else
 
     private async Task PlaylistClicked(PlaylistElement element)
     {
-        _playlistBeingPlayed = element;
         await PlaybackService.PlayFromPlaylistAsync(element.Path);
     }
 
@@ -116,7 +116,6 @@ else
 
     private void StopButtonClicked()
     {
-        _playlistBeingPlayed = null;
         PlaybackService.StopPlayback();
     }
 

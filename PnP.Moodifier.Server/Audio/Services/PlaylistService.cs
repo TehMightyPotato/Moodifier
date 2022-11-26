@@ -22,7 +22,7 @@ public class PlaylistService
         var playlistLoader = new PlaylistLoader(_config.PlaylistPath, _hostEnvironment);
         _playlists = playlistLoader.Playlists;
         _playlistStructure = playlistLoader.PlaylistsStructure;
-        _logger.LogInformation("Playlists loaded!");
+        _logger.LogInformation("PlaylistService Loaded");
     }
 
     public List<PlaylistElement> GetAll()
@@ -35,7 +35,7 @@ public class PlaylistService
         return _playlistStructure;
     }
 
-    public PlaylistElement GetByPath(string path)
+    public PlaylistElement GetByPath(string? path)
     {
         return _playlists.FirstOrDefault(x => x.Path == path) ?? throw new NullReferenceException("Bad playlist path");
     }
