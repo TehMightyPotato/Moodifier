@@ -2,6 +2,8 @@
 @using MightyPotato.PnP.Moodifier.Server.Audio.Services
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
 @using MightyPotato.PnP.Moodifier.Server.Components
+@using MightyPotato.PnP.Moodifier.Server.Audio.Interfaces
+@using MightyPotato.PnP.Moodifier.Server.Services.Audio
 @inject PlaylistService PlaylistService
 @inject MusicPlaybackService PlaybackService
 
@@ -33,31 +35,23 @@
             <i class="material-symbols-outlined">stop_circle</i>
         </button>
     </div>
-    @* <div class="flex-grow-1 d-flex fs-4 align-items-center"> *@
-    @*     <i class="material-symbols-outlined">music_note</i> *@
-    @*     <div class="ps-1 pe-1">></div> *@
-    @*     @if (_playlistBeingPlayed != null) *@
-    @*     { *@
-    @*         <div class="ellipsize-left">@_playlistBeingPlayed.Path.Replace("/", " / ")</div> *@
-    @*     } *@
-    @* </div> *@
-
-
 </div>
+
+
 @if (_playlistStructure != null)
 {
     <div class="container">
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4">
-            @foreach (var playlist in _current)
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
+            @foreach (var playlistElement in _currentFolder.Content)
             {
                 <div class="col">
-                    @if (playlist.MusicFiles != null && playlist.MusicFiles.Count <= 0)
+                    @if (playlistElement is Folder folder)
                     {
-                        <Folder PlaylistElement="playlist" OnClickCallback="FolderClicked"></Folder>
+                        <FolderComponent FolderElement="@folder" OnClickCallback="FolderClicked"></FolderComponent>
                     }
-                    else
+                    @if (playlistElement is Playlist playlist)
                     {
-                        <Playlist PlaylistElement="playlist" OnClickCallback="PlaylistClicked" IsPlaying="@(playlist == _playlistBeingPlayed)"></Playlist>
+                        <PlaylistComponent PlaylistElement="playlist" OnClickCallback="PlaylistClicked" IsPlaying="@(playlist == _playlistBeingPlayed)"></PlaylistComponent>
                     }
                 </div>
             }
@@ -72,13 +66,13 @@ else
 }
 
 @code {
-    private List<PlaylistElement>? _playlistStructure;
+    private Folder _playlistStructure;
 
-    private List<PlaylistElement> _current = null!;
+    private Folder _currentFolder = null!;
 
-    private PlaylistElement? _playlistBeingPlayed;
+    private Playlist? _playlistBeingPlayed;
 
-    private Stack<List<PlaylistElement>> _backStack = null!;
+    private Stack<Folder> _backStack = null!;
 
     protected override void OnInitialized()
     {
@@ -89,29 +83,26 @@ else
     private void Init()
     {
         _playlistStructure = PlaylistService.GetStructure();
-        _backStack = new Stack<List<PlaylistElement>>();
-        _current = _playlistStructure;
+        _backStack = new Stack<Folder>();
+        _currentFolder = _playlistStructure;
         _playlistBeingPlayed = PlaybackService.GetCurrentPlaylist();
-        PlaybackService.PlaylistChanged += (sender, element) =>
-        {
-            _playlistBeingPlayed = element;
-        };
+        PlaybackService.PlaylistChanged += (sender, element) => { _playlistBeingPlayed = element; };
     }
 
-    private void FolderClicked(PlaylistElement element)
+    private void FolderClicked(Folder folder)
     {
-        _backStack.Push(_current);
-        _current = element.Children!;
+        _backStack.Push(_currentFolder);
+        _currentFolder = folder;
     }
 
-    private async Task PlaylistClicked(PlaylistElement element)
+    private async Task PlaylistClicked(Playlist playlist)
     {
-        await PlaybackService.PlayFromPlaylistAsync(element.Path);
+        await PlaybackService.PlayFromPlaylistAsync(playlist.Path);
     }
 
     private void BackButtonClicked()
     {
-        _current = _backStack.Pop();
+        _currentFolder = _backStack.Pop();
     }
 
     private void StopButtonClicked()
@@ -128,8 +119,6 @@ else
     private void HomeButtonClicked()
     {
         _backStack.Clear();
-        _current = _playlistStructure!;
+        _currentFolder = _playlistStructure!;
     }
-
-
 }

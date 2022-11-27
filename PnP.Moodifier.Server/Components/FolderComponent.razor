@@ -1,0 +1,48 @@
+@using MightyPotato.PnP.Moodifier.Server.Audio.Models
+<div class="card w-100 folder text-start bg-dark text-white shadow" style="margin-bottom:15px" @onclick="OpenFolder">
+    <div class="card-header font-weight-bold d-flex w-100">
+        <div>
+            <i class="material-symbols-outlined folder-header-icon">folder</i>
+        </div>
+        <div class="ps-1 pe-1">
+            >
+        </div>
+        <div class="ellipsize-left w-auto">
+            @GetCardTitle()
+        </div>
+    </div>
+    <div class="card-img-bottom w-100 playlist-image-container">
+        <img class="playlist-image" src="@GetImagePath()"/>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+#pragma warning disable CS8618
+        public Folder FolderElement { get; set; }
+#pragma warning restore CS8618
+
+    [Parameter]
+    public EventCallback<Folder> OnClickCallback { get; set; }
+
+    private async Task OpenFolder()
+    {
+        await OnClickCallback.InvokeAsync(FolderElement);
+    }
+
+    private string GetCardTitle()
+    {
+        return FolderElement.Path.Replace("/", " > ");
+    }
+
+    private string GetImagePath()
+    {
+        if (FolderElement.ImagePath != null && FolderElement.ImagePath.Length > 0)
+        {
+            return "/images/playlists" + FolderElement.ImagePath;
+        }
+        return "/images/placeholder/playlist_cover_placeholder.png";
+    }
+
+}

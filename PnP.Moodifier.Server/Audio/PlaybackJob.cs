@@ -1,25 +1,26 @@
+using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
-namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
+namespace MightyPotato.PnP.Moodifier.Server.Audio;
 
 public sealed class PlaybackJob : IDisposable
 {
     public event EventHandler? OnTrackFinished;
-    public bool Running { get; private set; }
+    public float Volume { get; set; }
 
     private readonly string _filePath;
     private readonly int _fadeInDuration;
     private readonly int _fadeOutDuration;
     private readonly CancellationTokenSource _cancellationTokenSource;
 
-    public PlaybackJob(string filePath, int fadeInDuration, int fadeOutDuration)
+    public PlaybackJob(string filePath, int fadeInDuration, int fadeOutDuration, float volume)
     {
         _cancellationTokenSource = new CancellationTokenSource();
-        Running = false;
         _filePath = filePath;
         _fadeInDuration = fadeInDuration;
         _fadeOutDuration = fadeOutDuration;
+        Volume = volume;
     }
 
     public void Run()
@@ -38,10 +39,9 @@ public sealed class PlaybackJob : IDisposable
         using (var waveOut = new WaveOutEvent())
         {
             var fader = new FadeInOutSampleProvider(fileReader, true);
-             waveOut.Init(fader);
-            waveOut.Init(fileReader);
+            waveOut.Init(fader);
+            waveOut.Volume = Volume;
             waveOut.PlaybackStopped += OnPlaybackStopped;
-            Running = true;
             fader.BeginFadeIn(_fadeInDuration);
             waveOut.Play();
             try
@@ -49,6 +49,10 @@ public sealed class PlaybackJob : IDisposable
                 while (waveOut.PlaybackState == PlaybackState.Playing)
                 {
                     await Task.Delay(10, token);
+                    if (Math.Abs(waveOut.Volume - Volume) > float.Epsilon)
+                    {
+                        waveOut.Volume = Volume;
+                    }
                     token.ThrowIfCancellationRequested();
                 }
             }
@@ -62,14 +66,19 @@ public sealed class PlaybackJob : IDisposable
                 fader.BeginFadeOut(_fadeOutDuration);
                 await Task.Delay(_fadeOutDuration);
             }
+
             waveOut.PlaybackStopped -= OnPlaybackStopped;
         }
-        Running = false;
     }
 
     private void OnPlaybackStopped(object? sender, StoppedEventArgs stoppedEventArgs)
     {
         OnTrackFinished?.Invoke(sender, stoppedEventArgs);
+    }
+
+    private void VolumeChanged(object sender, float volume)
+    {
+        Volume = volume;
     }
 
     public void Dispose()

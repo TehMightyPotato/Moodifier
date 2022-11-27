@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using MightyPotato.PnP.Moodifier.Server.Audio.Interfaces;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
 
@@ -10,9 +11,9 @@ public class PlaylistService
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly AudioConfig _config;
     
-    private List<PlaylistElement> _playlists;
+    private List<Playlist> _playlists;
 
-    private List<PlaylistElement> _playlistStructure;
+    private Folder _playlistStructure;
 
     public PlaylistService(ILogger<PlaylistService> logger, IOptions<AudioConfig> config, IWebHostEnvironment hostEnvironment)
     {
@@ -25,17 +26,17 @@ public class PlaylistService
         _logger.LogInformation("PlaylistService Loaded");
     }
 
-    public List<PlaylistElement> GetAll()
+    public List<Playlist> GetAllPlaylists()
     {
         return _playlists;
     }
 
-    public List<PlaylistElement> GetStructure()
+    public Folder GetStructure()
     {
         return _playlistStructure;
     }
 
-    public PlaylistElement GetByPath(string? path)
+    public Playlist GetPlaylistByPath(string? path)
     {
         return _playlists.FirstOrDefault(x => x.Path == path) ?? throw new NullReferenceException("Bad playlist path");
     }

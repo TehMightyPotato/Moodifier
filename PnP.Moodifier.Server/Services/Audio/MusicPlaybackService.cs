@@ -1,23 +1,29 @@
 using Microsoft.Extensions.Options;
+using MightyPotato.PnP.Moodifier.Server.Audio;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
+using MightyPotato.PnP.Moodifier.Server.Audio.Services;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
 
-namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
+namespace MightyPotato.PnP.Moodifier.Server.Services.Audio;
 
 public sealed class MusicPlaybackService
 {
-    public event EventHandler<PlaylistElement?>? PlaylistChanged;
+    public event EventHandler<Playlist?>? PlaylistChanged;
+    public event EventHandler<float>? VolumeChanged;
+
+    public float Volume { get; private set; }
 
     private readonly ILogger<MusicPlaybackService> _logger;
     private readonly PlaylistService _playlistService;
     private readonly AudioConfig _config;
 
     private PlaybackJob? _currentPlaybackJob;
-    private PlaylistElement? _currentPlaylist;
+    private Playlist? _currentPlaylist;
 
     public MusicPlaybackService(ILogger<MusicPlaybackService> logger, PlaylistService playlistService,
         IOptions<AudioConfig> config)
     {
+        Volume = 1;
         _logger = logger;
         _playlistService = playlistService;
         _config = config.Value;
@@ -26,23 +32,23 @@ public sealed class MusicPlaybackService
 
     public async Task<string?> PlayFromPlaylistAsync(string path)
     {
-        var newPlaylist = _playlistService.GetByPath(path);
+        var newPlaylist = _playlistService.GetPlaylistByPath(path);
         return await PlayFromPlaylistAsync(newPlaylist);
     }
 
-    private Task<string> PlayFromPlaylistAsync(PlaylistElement playlistElement)
+    private Task<string> PlayFromPlaylistAsync(Playlist playlist)
     {
-        _logger.LogInformation("Requested to play: {PlaylistPath}", playlistElement.Path);
-        _currentPlaylist = playlistElement;
+        _logger.LogInformation("Requested to play: {PlaylistPath}", playlist.Path);
+        _currentPlaylist = playlist;
         _currentPlaybackJob?.Stop();
         _currentPlaybackJob?.Dispose();
-        var songPath = playlistElement.GetNext();
-        if (_currentPlaybackJob != null) _currentPlaybackJob.OnTrackFinished -= CurrentPlaybackJobOnOnTrackFinished;
-        _currentPlaybackJob = new PlaybackJob(songPath, _config.FadeInDuration, _config.FadeOutDuration);
+        var songPath = playlist.GetNext();
+        if (_currentPlaybackJob != null) _currentPlaybackJob.OnTrackFinished -= CurrentPlaybackJobOnTrackFinished;
+        _currentPlaybackJob = new PlaybackJob(songPath, _config.FadeInDuration, _config.FadeOutDuration, Volume);
         _currentPlaybackJob.Run();
-        _currentPlaybackJob.OnTrackFinished += CurrentPlaybackJobOnOnTrackFinished;
-        OnPlaylistChanged(playlistElement);
-        return Task.FromResult(playlistElement.Path);
+        _currentPlaybackJob.OnTrackFinished += CurrentPlaybackJobOnTrackFinished;
+        OnPlaylistChanged(playlist);
+        return Task.FromResult(playlist.Path);
     }
 
     public void StopPlayback()
@@ -54,12 +60,18 @@ public sealed class MusicPlaybackService
         OnPlaylistChanged(null);
     }
 
-    public PlaylistElement? GetCurrentPlaylist()
+    public Playlist? GetCurrentPlaylist()
     {
         return _currentPlaylist ?? null;
     }
 
-    private async void CurrentPlaybackJobOnOnTrackFinished(object? sender, EventArgs e)
+    public void SetVolume(float newVolume)
+    {
+        Volume = newVolume;
+        if (_currentPlaybackJob != null) _currentPlaybackJob.Volume = Volume;
+    }
+    
+    private async void CurrentPlaybackJobOnTrackFinished(object? sender, EventArgs e)
     {
         if (_currentPlaylist != null)
         {
@@ -67,7 +79,7 @@ public sealed class MusicPlaybackService
         }
     }
 
-    private void OnPlaylistChanged(PlaylistElement? e)
+    private void OnPlaylistChanged(Playlist? e)
     {
         PlaylistChanged?.Invoke(this, e);
     }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using MightyPotato.PnP.Moodifier.Server.Audio.Services;
+using MightyPotato.PnP.Moodifier.Server.Services.Audio;
 
 namespace MightyPotato.PnP.Moodifier.Server.Controller;
 
@@ -18,7 +19,7 @@ public class PlaybackController : ControllerBase
     }
 
     [HttpGet("Play/{*path}")]
-    public async Task<ActionResult<PlaylistElement>> Play(string path)
+    public async Task<ActionResult<Playlist>> Play(string path)
     {
         try
         {

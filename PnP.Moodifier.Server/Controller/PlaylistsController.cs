@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MightyPotato.PnP.Moodifier.Server.Audio.Interfaces;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using MightyPotato.PnP.Moodifier.Server.Audio.Services;
 
@@ -18,11 +19,11 @@ public class PlaylistsController : ControllerBase
     }
     
     [HttpGet("{*path}")]
-    public ActionResult<PlaylistElement> Get(string? path)
+    public ActionResult<Playlist> Get(string? path)
     {
         try
         {
-            return Ok(_playlistService.GetByPath(path));
+            return Ok(_playlistService.GetPlaylistByPath(path));
         }
         catch (NullReferenceException e)
         {
@@ -32,8 +33,8 @@ public class PlaylistsController : ControllerBase
         }
     }
     [HttpGet()]
-    public ActionResult<List<PlaylistElement>> Get()
+    public ActionResult<List<Playlist>> Get()
     {
-        return _playlistService.GetAll();
+        return _playlistService.GetAllPlaylists();
     }
 }

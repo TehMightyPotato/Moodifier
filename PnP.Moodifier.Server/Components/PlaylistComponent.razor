@@ -1,8 +1,8 @@
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
-<div class="card w-100 folder text-start bg-dark text-white shadow" style="margin-bottom:15px" @onclick="OpenFolder">
+<div class="card w-100 playlist text-start @(IsPlaying ? "bg-success text-white" : "bg-dark text-white") shadow" style="margin-bottom:15px" @onclick="PlayPlaylist">
     <div class="card-header font-weight-bold d-flex w-100">
         <div>
-            <i class="material-symbols-outlined folder-header-icon">folder</i>
+            <i class="material-symbols-outlined folder-header-icon">queue_music</i>
         </div>
         <div class="ps-1 pe-1">
             >
@@ -11,8 +11,9 @@
             @GetCardTitle()
         </div>
     </div>
-    <div class="card-img-bottom w-100 playlist-image-container">
+    <div class="card-img-bottom w-100 playlist-image-container position-relative">
         <img class="playlist-image" src="@GetImagePath()"/>
+        <i class="material-symbols-outlined center-icon">play_circle</i>
     </div>
 </div>
 
@@ -20,20 +21,23 @@
 
     [Parameter]
 #pragma warning disable CS8618
-        public PlaylistElement PlaylistElement { get; set; }
+        public Playlist PlaylistElement { get; set; }
 #pragma warning restore CS8618
+    
+    [Parameter]
+    public EventCallback<Playlist> OnClickCallback { get; set; }
 
     [Parameter]
-    public EventCallback<PlaylistElement> OnClickCallback { get; set; }
+    public bool IsPlaying { get; set; }
 
-    private async Task OpenFolder()
+    private async Task PlayPlaylist()
     {
         await OnClickCallback.InvokeAsync(PlaylistElement);
     }
 
-    private string GetCardTitle()
+    private string? GetCardTitle()
     {
-        return PlaylistElement.Path.Replace("/", " > ");
+        return PlaylistElement?.Path.Replace("/", " > ");
     }
 
     private string GetImagePath()
