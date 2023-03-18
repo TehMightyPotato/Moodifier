@@ -1,4 +1,3 @@
-using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
@@ -74,11 +73,6 @@ public sealed class PlaybackJob : IDisposable
     private void OnPlaybackStopped(object? sender, StoppedEventArgs stoppedEventArgs)
     {
         OnTrackFinished?.Invoke(sender, stoppedEventArgs);
-    }
-
-    private void VolumeChanged(object sender, float volume)
-    {
-        Volume = volume;
     }
 
     public void Dispose()

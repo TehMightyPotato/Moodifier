@@ -7,9 +7,6 @@ public class PlaylistLoader
 {
     private readonly string[] _musicFileExtensions = new[] { ".mp3", ".wav" };
     private readonly string[] _imageFileExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp" };
-
-    private readonly IWebHostEnvironment _webHostEnvironment;
-
     //Populated by LoadPlaylists
     public List<Playlist> Playlists { get; set; }
 
@@ -20,7 +17,6 @@ public class PlaylistLoader
 
     public PlaylistLoader(string playlistRootPath, IWebHostEnvironment webHostEnvironment)
     {
-        _webHostEnvironment = webHostEnvironment;
         Playlists = new List<Playlist>();
         _imageDirectoryPath = webHostEnvironment.WebRootPath + "/images/playlists/";
         CleanupOldImages();
@@ -95,7 +91,7 @@ public class PlaylistLoader
         File.Copy(originalImagePath, newPath + "/cover" + originalExtension);
         var a = new Uri(fullNewPath);
         var b = new Uri(_imageDirectoryPath);
-        return "/" + b.MakeRelativeUri(a).ToString();
+        return "/" + b.MakeRelativeUri(a);
     }
 
     private void CleanupOldImages()

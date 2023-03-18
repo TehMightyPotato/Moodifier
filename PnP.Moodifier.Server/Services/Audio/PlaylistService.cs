@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
-using MightyPotato.PnP.Moodifier.Server.Audio.Interfaces;
+using MightyPotato.PnP.Moodifier.Server.Audio;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
 
-namespace MightyPotato.PnP.Moodifier.Server.Audio.Services;
+namespace MightyPotato.PnP.Moodifier.Server.Services.Audio;
 
 public class PlaylistService
 {

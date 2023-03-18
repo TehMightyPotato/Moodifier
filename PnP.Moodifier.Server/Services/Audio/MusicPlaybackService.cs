@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Options;
 using MightyPotato.PnP.Moodifier.Server.Audio;
 using MightyPotato.PnP.Moodifier.Server.Audio.Models;
-using MightyPotato.PnP.Moodifier.Server.Audio.Services;
 using MightyPotato.PnP.Moodifier.Server.Configuration;
 
 namespace MightyPotato.PnP.Moodifier.Server.Services.Audio;
@@ -9,8 +8,6 @@ namespace MightyPotato.PnP.Moodifier.Server.Services.Audio;
 public sealed class MusicPlaybackService
 {
     public event EventHandler<Playlist?>? PlaylistChanged;
-    public event EventHandler<float>? VolumeChanged;
-
     public float Volume { get; private set; }
 
     private readonly ILogger<MusicPlaybackService> _logger;

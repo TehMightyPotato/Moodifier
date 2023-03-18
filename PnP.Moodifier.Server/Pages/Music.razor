@@ -1,8 +1,6 @@
 ﻿@page "/music"
-@using MightyPotato.PnP.Moodifier.Server.Audio.Services
 @using MightyPotato.PnP.Moodifier.Server.Audio.Models
 @using MightyPotato.PnP.Moodifier.Server.Components
-@using MightyPotato.PnP.Moodifier.Server.Audio.Interfaces
 @using MightyPotato.PnP.Moodifier.Server.Services.Audio
 @inject PlaylistService PlaylistService
 @inject MusicPlaybackService PlaybackService
@@ -15,7 +13,7 @@
             <button type="button" class="btn btn-primary d-flex" @onclick="BackButtonClicked">
                 <i class="material-symbols-outlined">arrow_back</i>
             </button>
-            <button type="button" class="btn btn-secondary d-flex" @onclick="BackButtonClicked">
+            <button type="button" class="btn btn-secondary d-flex" @onclick="HomeButtonClicked">
                 <i class="material-symbols-outlined">home</i>
             </button>
         }
@@ -42,18 +40,21 @@
 {
     <div class="container">
         <div class="row row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
-            @foreach (var playlistElement in _currentFolder.Content)
+            @if (_currentFolder?.Content != null)
             {
-                <div class="col">
-                    @if (playlistElement is Folder folder)
-                    {
-                        <FolderComponent FolderElement="@folder" OnClickCallback="FolderClicked"></FolderComponent>
-                    }
-                    @if (playlistElement is Playlist playlist)
-                    {
-                        <PlaylistComponent PlaylistElement="playlist" OnClickCallback="PlaylistClicked" IsPlaying="@(playlist == _playlistBeingPlayed)"></PlaylistComponent>
-                    }
-                </div>
+                foreach (var playlistElement in _currentFolder.Content)
+                {
+                    <div class="col">
+                        @if (playlistElement is Folder folder)
+                        {
+                            <FolderComponent FolderElement="@folder" OnClickCallback="@FolderClicked"></FolderComponent>
+                        }
+                        @if (playlistElement is Playlist playlist)
+                        {
+                            <PlaylistComponent PlaylistElement="@playlist" OnClickCallback="@PlaylistClicked" IsPlaying="@(playlist == _playlistBeingPlayed)"></PlaylistComponent>
+                        }
+                    </div>
+                }
             }
         </div>
     </div>
@@ -66,9 +67,9 @@ else
 }
 
 @code {
-    private Folder _playlistStructure;
+    private Folder? _playlistStructure;
 
-    private Folder _currentFolder = null!;
+    private Folder? _currentFolder;
 
     private Playlist? _playlistBeingPlayed;
 
@@ -86,12 +87,12 @@ else
         _backStack = new Stack<Folder>();
         _currentFolder = _playlistStructure;
         _playlistBeingPlayed = PlaybackService.GetCurrentPlaylist();
-        PlaybackService.PlaylistChanged += (sender, element) => { _playlistBeingPlayed = element; };
+        PlaybackService.PlaylistChanged += (_, element) => { _playlistBeingPlayed = element; };
     }
 
     private void FolderClicked(Folder folder)
     {
-        _backStack.Push(_currentFolder);
+        if (_currentFolder != null) _backStack.Push(_currentFolder);
         _currentFolder = folder;
     }
 
@@ -119,6 +120,6 @@ else
     private void HomeButtonClicked()
     {
         _backStack.Clear();
-        _currentFolder = _playlistStructure!;
+        _currentFolder = _playlistStructure;
     }
 }
